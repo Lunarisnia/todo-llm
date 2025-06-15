@@ -15,7 +15,7 @@ func NewBreakDownAgent(model llm.LLM) *BreakDownAgent {
 
 	agent.Model.AddSystemPrompt(`
 		Your task is to break down task that is described by the user,
-		Always start your bullet point with the character '*' and no other formatting characters,
+		Always start your bullet point with the character '*' and no other formatting characters, Be specific on what needs to be done
 		Only reply with the bullet point of what the user need to do, no need for any further explanation or flavour text.
 		`)
 

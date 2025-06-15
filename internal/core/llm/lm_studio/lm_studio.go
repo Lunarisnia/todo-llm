@@ -8,7 +8,8 @@ import (
 )
 
 type lmStudioImpl struct {
-	llmInfo LLMInfo
+	userPrompt LMStudioMessage
+	llmInfo    LLMInfo
 }
 
 func NewLMStudio(temperature float32, maxToken int) llm.LLM {
@@ -31,16 +32,22 @@ func (l *lmStudioImpl) AddSystemPrompt(prompt string) error {
 }
 
 func (l *lmStudioImpl) AddUserPrompt(prompt string) error {
-	message := LMStudioMessage{
+	l.userPrompt = LMStudioMessage{
 		Role:    LMStudioUser,
 		Content: prompt,
 	}
-	l.llmInfo.AddMessage(message)
 	return nil
 }
 
 func (l *lmStudioImpl) Execute() (*llm.ChatResponse, error) {
-	body, err := json.Marshal(l.llmInfo)
+	info := l.llmInfo
+	info.Messages = make([]LMStudioMessage, 0)
+	for _, message := range l.llmInfo.Messages {
+		info.Messages = append(info.Messages, message)
+	}
+	info.Messages = append(info.Messages, l.userPrompt)
+
+	body, err := json.Marshal(info)
 	if err != nil {
 		return nil, err
 	}
