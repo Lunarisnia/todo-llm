@@ -1,7 +1,13 @@
 package main
 
-import "fmt"
+import (
+	"github.com/Lunarisnia/todo-llm/internal/core"
+	"github.com/Lunarisnia/todo-llm/internal/input"
+)
 
 func main() {
-	fmt.Println("Hello, World")
+	inputEngine := input.NewInputEngine()
+
+	todoEngine := core.NewTodoEngine(inputEngine)
+	todoEngine.Run()
 }
