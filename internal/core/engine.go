@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/Lunarisnia/todo-llm/internal/core/llm"
 	"github.com/Lunarisnia/todo-llm/internal/input"
 )
 
@@ -14,12 +15,14 @@ type TodoEngine interface {
 type todoEngineImpl struct {
 	State       EngineState
 	InputEngine input.InputEngine
+	LLMModel    llm.LLM
 }
 
-func NewTodoEngine(inputEngine input.InputEngine) TodoEngine {
+func NewTodoEngine(inputEngine input.InputEngine, llmModel llm.LLM) TodoEngine {
 	return &todoEngineImpl{
 		State:       MainMenu,
 		InputEngine: inputEngine,
+		LLMModel:    llmModel,
 	}
 }
 

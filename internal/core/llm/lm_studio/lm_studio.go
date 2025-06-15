@@ -1,6 +1,12 @@
 package lmstudio
 
-import "github.com/Lunarisnia/todo-llm/internal/core/llm"
+import (
+	"encoding/json"
+	"fmt"
+
+	httpclient "github.com/Lunarisnia/todo-llm/internal/core/http_client"
+	"github.com/Lunarisnia/todo-llm/internal/core/llm"
+)
 
 type lmStudioImpl struct {
 	llmInfo LLMInfo
@@ -36,5 +42,18 @@ func (l *lmStudioImpl) AddUserPrompt(prompt string) error {
 
 func (l *lmStudioImpl) Execute() error {
 	// TODO: Create http abstraction
+	body, err := json.Marshal(l.llmInfo)
+	if err != nil {
+		return err
+	}
+
+	chatResponse := &ChatResponse{}
+	err = httpclient.Do.Post("http://192.168.0.154:1234/api/v0/chat/completions", body, &chatResponse)
+	if err != nil {
+		return err
+	}
+	for _, choice := range chatResponse.Choices {
+		fmt.Println(choice.Message)
+	}
 	return nil
 }
