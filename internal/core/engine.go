@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 
+	breakdown "github.com/Lunarisnia/todo-llm/internal/core/agents/break_down"
 	"github.com/Lunarisnia/todo-llm/internal/core/llm"
 	"github.com/Lunarisnia/todo-llm/internal/input"
 )
@@ -42,9 +43,18 @@ func (t *todoEngineImpl) Run() {
 }
 
 func (t *todoEngineImpl) mainMenu() {
+	agent := breakdown.NewBreakDownAgent(t.LLMModel.Clone())
 	fmt.Println("1. Add a new todo list")
 	fmt.Println("2. List all todo list")
-	t.InputEngine.Read("What do you want to do?")
+	selection := t.InputEngine.Read("What do you want to do?")
+	if selection == "1" {
+		prompt := t.InputEngine.Read("What task do you need help?")
+		err := agent.Chat(prompt)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+	}
 }
 
 func (t *todoEngineImpl) changeState(newState EngineState) {

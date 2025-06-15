@@ -41,13 +41,13 @@ func (l *lmStudioImpl) AddUserPrompt(prompt string) error {
 }
 
 func (l *lmStudioImpl) Execute() error {
-	// TODO: Create http abstraction
 	body, err := json.Marshal(l.llmInfo)
 	if err != nil {
 		return err
 	}
 
 	chatResponse := &ChatResponse{}
+	// TODO: Put the url somewhere else later
 	err = httpclient.Do.Post("http://192.168.0.154:1234/api/v0/chat/completions", body, &chatResponse)
 	if err != nil {
 		return err
@@ -55,5 +55,16 @@ func (l *lmStudioImpl) Execute() error {
 	for _, choice := range chatResponse.Choices {
 		fmt.Println(choice.Message)
 	}
+	// TODO: Make this return the result instead of printing it
 	return nil
+}
+
+func (l *lmStudioImpl) Clone() llm.LLM {
+	return &lmStudioImpl{
+		llmInfo: LLMInfo{
+			Messages:    make([]LMStudioMessage, 0),
+			Temperature: l.llmInfo.Temperature,
+			MaxToken:    l.llmInfo.MaxToken,
+		},
+	}
 }
