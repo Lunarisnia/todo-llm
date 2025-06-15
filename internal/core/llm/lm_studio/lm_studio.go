@@ -2,7 +2,6 @@ package lmstudio
 
 import (
 	"encoding/json"
-	"fmt"
 
 	httpclient "github.com/Lunarisnia/todo-llm/internal/core/http_client"
 	"github.com/Lunarisnia/todo-llm/internal/core/llm"
@@ -40,23 +39,20 @@ func (l *lmStudioImpl) AddUserPrompt(prompt string) error {
 	return nil
 }
 
-func (l *lmStudioImpl) Execute() error {
+func (l *lmStudioImpl) Execute() (*llm.ChatResponse, error) {
 	body, err := json.Marshal(l.llmInfo)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	chatResponse := &ChatResponse{}
+	chatResponse := llm.ChatResponse{}
 	// TODO: Put the url somewhere else later
 	err = httpclient.Do.Post("http://192.168.0.154:1234/api/v0/chat/completions", body, &chatResponse)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	for _, choice := range chatResponse.Choices {
-		fmt.Println(choice.Message)
-	}
-	// TODO: Make this return the result instead of printing it
-	return nil
+
+	return &chatResponse, nil
 }
 
 func (l *lmStudioImpl) Clone() llm.LLM {

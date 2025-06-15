@@ -3,7 +3,6 @@ package httpclient
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"net/http"
 )
 
@@ -22,7 +21,6 @@ func (h *HTTPClient) Post(url string, body []byte, dest any) error {
 		return err
 	}
 
-	fmt.Println(request.Body)
 	resp, err := h.client.Do(request)
 	if err != nil {
 		return err

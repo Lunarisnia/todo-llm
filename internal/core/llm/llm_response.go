@@ -1,4 +1,4 @@
-package lmstudio
+package llm
 
 type ChatResponse struct {
 	ID        string    `json:"id"`

@@ -17,14 +17,18 @@ type todoEngineImpl struct {
 	State       EngineState
 	InputEngine input.InputEngine
 	LLMModel    llm.LLM
+	TaskAgent   *breakdown.BreakDownAgent
 }
 
 func NewTodoEngine(inputEngine input.InputEngine, llmModel llm.LLM) TodoEngine {
-	return &todoEngineImpl{
+	taskAgent := breakdown.NewBreakDownAgent(llmModel.Clone())
+	todoEngine := &todoEngineImpl{
 		State:       MainMenu,
 		InputEngine: inputEngine,
 		LLMModel:    llmModel,
+		TaskAgent:   taskAgent,
 	}
+	return todoEngine
 }
 
 func (t *todoEngineImpl) Run() {
@@ -43,18 +47,14 @@ func (t *todoEngineImpl) Run() {
 }
 
 func (t *todoEngineImpl) mainMenu() {
-	agent := breakdown.NewBreakDownAgent(t.LLMModel.Clone())
 	fmt.Println("1. Add a new todo list")
 	fmt.Println("2. List all todo list")
 	selection := t.InputEngine.Read("What do you want to do?")
-	if selection == "1" {
-		prompt := t.InputEngine.Read("What task do you need help?")
-		err := agent.Chat(prompt)
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
+	result, err := t.TaskAgent.Chat(selection)
+	if err != nil {
+		return
 	}
+	fmt.Println(result.Choices)
 }
 
 func (t *todoEngineImpl) changeState(newState EngineState) {
