@@ -17,7 +17,6 @@ type TodoEngine interface {
 
 // TODO: Connect it to a database
 type todoEngineImpl struct {
-	State       EngineState
 	InputEngine input.InputEngine
 	Storage     []*task.Task
 
@@ -30,7 +29,6 @@ func NewTodoEngine(inputEngine input.InputEngine, llmModel llm.LLM) TodoEngine {
 	taskAgent := breakdown.NewBreakDownAgent(llmModel.Clone())
 	describerAgent := describe.NewDescribeAgent(llmModel.Clone())
 	todoEngine := &todoEngineImpl{
-		State:          MainMenu,
 		InputEngine:    inputEngine,
 		LLMModel:       llmModel,
 		TaskAgent:      taskAgent,
