@@ -13,7 +13,7 @@ type MainMenu struct {
 	Options     []menu.Option
 }
 
-func NewMainMenu(todoEngine core.TodoEngine) *MainMenu {
+func NewMainMenu(todoEngine core.TodoEngine) menu.Menu {
 	mainMenu := &MainMenu{
 		CursorIndex: 0,
 		Options:     make([]menu.Option, 0),
@@ -35,6 +35,18 @@ func NewMainMenu(todoEngine core.TodoEngine) *MainMenu {
 	))
 
 	return mainMenu
+}
+
+func (m *MainMenu) GetCursorIndex() int {
+	return m.CursorIndex
+}
+
+func (m *MainMenu) SetCursorIndex(newIndex int) {
+	m.CursorIndex = newIndex
+}
+
+func (m *MainMenu) GetOptions() []menu.Option {
+	return m.Options
 }
 
 // NEXT TODO: Rendering engine
