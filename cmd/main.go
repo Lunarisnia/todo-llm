@@ -11,5 +11,7 @@ func main() {
 	inputEngine := input.NewInputEngine()
 
 	todoEngine := core.NewTodoEngine(inputEngine, llmModel)
-	todoEngine.Run()
+	todoEngine.CreateTask()
+
+	todoEngine.ListTask()
 }
