@@ -1,20 +1,19 @@
 package core
 
 import (
-	"fmt"
-	"log"
-
 	breakdown "github.com/Lunarisnia/todo-llm/internal/core/agents/break_down"
 	"github.com/Lunarisnia/todo-llm/internal/core/agents/describe"
 	"github.com/Lunarisnia/todo-llm/internal/core/llm"
+	lmstudio "github.com/Lunarisnia/todo-llm/internal/core/llm/lm_studio"
 	"github.com/Lunarisnia/todo-llm/internal/core/task"
 	"github.com/Lunarisnia/todo-llm/internal/input"
 )
 
 type TodoEngine interface {
-	CreateTask(content string) error
+	CreateTask(content string) (*task.Task, error)
 	CreateSubtask(taskId uint, content string) error
-	ListTask() error
+	HelpBreakdown(tsk *task.Task) ([]task.Task, error)
+	ListTask() ([]task.Task, error)
 }
 
 // TODO: Connect it to a database
@@ -41,9 +40,10 @@ func NewTodoEngine(inputEngine input.InputEngine, llmModel llm.LLM) TodoEngine {
 	return todoEngine
 }
 
-func (t *todoEngineImpl) CreateTask(content string) error {
-	// TODO: Create task
-	return nil
+func (t *todoEngineImpl) CreateTask(content string) (*task.Task, error) {
+	newTask := task.NewTask(content, nil, nil)
+	t.Storage = append(t.Storage, newTask)
+	return &newTask, nil
 }
 
 func (t *todoEngineImpl) CreateSubtask(taskId uint, content string) error {
@@ -51,44 +51,25 @@ func (t *todoEngineImpl) CreateSubtask(taskId uint, content string) error {
 	return nil
 }
 
-func (t *todoEngineImpl) ListTask() error {
-	// TODO: Create list task
-	return nil
-}
-
-func (t *todoEngineImpl) Run() {
-	for {
-		switch t.State {
-		case MainMenu:
-			t.mainMenu()
-		case AddNew:
-			log.Fatalln("TODO: Implement add new")
-		case ListAll:
-			log.Fatalln("TODO: Implement list all")
-		default:
-			log.Fatalln("unknown or unimplemented state")
-		}
-	}
-}
-
-// TODO: Make this a proper main menu
-func (t *todoEngineImpl) mainMenu() {
-	fmt.Println("1. Add a new todo list")
-	fmt.Println("2. List all todo list")
-	selection := t.InputEngine.Read("What do you want to do?")
-	described, err := t.DescriberAgent.Chat(selection)
+func (t *todoEngineImpl) HelpBreakdown(tsk *task.Task) ([]task.Task, error) {
+	describedProblem, err := t.DescriberAgent.Chat(tsk.Content)
 	if err != nil {
-		return
+		return nil, err
 	}
-	fmt.Println(described.Choices)
-	result, err := t.TaskAgent.Chat(described.Choices[0].Message.Content)
+	problemBrokeDown, err := t.TaskAgent.Chat(describedProblem.Choices[0].Message.Content)
 	if err != nil {
-		return
+		return nil, err
 	}
-	fmt.Println(result.Choices)
+	parsedTasks := lmstudio.ParseBulletPoint(problemBrokeDown)
 
+	tasks := make([]task.Task, 0)
+	for _, pt := range parsedTasks {
+		tasks = append(tasks, task.NewTask(pt, nil, nil))
+	}
+
+	return tasks, nil
 }
 
-func (t *todoEngineImpl) changeState(newState EngineState) {
-	t.State = newState
+func (t *todoEngineImpl) ListTask() ([]task.Task, error) {
+	return t.Storage, nil
 }

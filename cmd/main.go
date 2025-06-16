@@ -11,7 +11,12 @@ func main() {
 	inputEngine := input.NewInputEngine()
 
 	todoEngine := core.NewTodoEngine(inputEngine, llmModel)
-	todoEngine.CreateTask()
+	// todoEngine.Run()
+	newTask, err := todoEngine.CreateTask("Make an omellete")
+	if err != nil {
+		panic(err)
+	}
+	todoEngine.HelpBreakdown(newTask)
 
-	todoEngine.ListTask()
+	// todoEngine.ListTask()
 }
