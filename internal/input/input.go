@@ -5,20 +5,11 @@ import (
 	"fmt"
 	"log"
 	"os"
+
+	"github.com/eiannone/keyboard"
 )
 
-type InputEngine interface {
-	Read(prompt string) string
-}
-
-type inputEngine struct {
-}
-
-func NewInputEngine() InputEngine {
-	return &inputEngine{}
-}
-
-func (i *inputEngine) Read(prompt string) string {
+func Read(prompt string) string {
 	fmt.Print(prompt, " ")
 	scanner := bufio.NewScanner(os.Stdin)
 	scanner.Scan()
@@ -27,4 +18,23 @@ func (i *inputEngine) Read(prompt string) string {
 		log.Fatal(err)
 	}
 	return scanner.Text()
+}
+
+func ReadKeyboard(prompt string) (rune, keyboard.Key) {
+	if err := keyboard.Open(); err != nil {
+		panic(err)
+	}
+	defer keyboard.Close()
+
+	for {
+		r, key, err := keyboard.GetKey()
+		if err != nil {
+			panic(err)
+		}
+		if key == keyboard.KeyEsc {
+			os.Exit(0)
+		}
+		return r, key
+	}
+
 }

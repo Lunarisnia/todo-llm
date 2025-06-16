@@ -6,7 +6,6 @@ import (
 	"github.com/Lunarisnia/todo-llm/internal/core/llm"
 	lmstudio "github.com/Lunarisnia/todo-llm/internal/core/llm/lm_studio"
 	"github.com/Lunarisnia/todo-llm/internal/core/task"
-	"github.com/Lunarisnia/todo-llm/internal/input"
 )
 
 type TodoEngine interface {
@@ -17,19 +16,17 @@ type TodoEngine interface {
 
 // TODO: Connect it to a database
 type todoEngineImpl struct {
-	InputEngine input.InputEngine
-	Storage     []*task.Task
+	Storage []*task.Task
 
 	LLMModel       llm.LLM
 	TaskAgent      *breakdown.BreakDownAgent
 	DescriberAgent *describe.DescribeAgent
 }
 
-func NewTodoEngine(inputEngine input.InputEngine, llmModel llm.LLM) TodoEngine {
+func NewTodoEngine(llmModel llm.LLM) TodoEngine {
 	taskAgent := breakdown.NewBreakDownAgent(llmModel.Clone())
 	describerAgent := describe.NewDescribeAgent(llmModel.Clone())
 	todoEngine := &todoEngineImpl{
-		InputEngine:    inputEngine,
 		LLMModel:       llmModel,
 		TaskAgent:      taskAgent,
 		DescriberAgent: describerAgent,
