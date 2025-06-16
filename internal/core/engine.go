@@ -11,16 +11,15 @@ import (
 
 type TodoEngine interface {
 	CreateTask(content string) (*task.Task, error)
-	CreateSubtask(taskId uint, content string) error
 	HelpBreakdown(tsk *task.Task) ([]task.Task, error)
-	ListTask() ([]task.Task, error)
+	ListTask() ([]*task.Task, error)
 }
 
 // TODO: Connect it to a database
 type todoEngineImpl struct {
 	State       EngineState
 	InputEngine input.InputEngine
-	Storage     []task.Task
+	Storage     []*task.Task
 
 	LLMModel       llm.LLM
 	TaskAgent      *breakdown.BreakDownAgent
@@ -41,14 +40,9 @@ func NewTodoEngine(inputEngine input.InputEngine, llmModel llm.LLM) TodoEngine {
 }
 
 func (t *todoEngineImpl) CreateTask(content string) (*task.Task, error) {
-	newTask := task.NewTask(content, nil, nil)
-	t.Storage = append(t.Storage, newTask)
+	newTask := task.NewTask(content, nil)
+	t.Storage = append(t.Storage, &newTask)
 	return &newTask, nil
-}
-
-func (t *todoEngineImpl) CreateSubtask(taskId uint, content string) error {
-	// TODO: Create subtask
-	return nil
 }
 
 func (t *todoEngineImpl) HelpBreakdown(tsk *task.Task) ([]task.Task, error) {
@@ -64,12 +58,14 @@ func (t *todoEngineImpl) HelpBreakdown(tsk *task.Task) ([]task.Task, error) {
 
 	tasks := make([]task.Task, 0)
 	for _, pt := range parsedTasks {
-		tasks = append(tasks, task.NewTask(pt, nil, nil))
+		tasks = append(tasks, task.NewTask(pt, nil))
 	}
 
 	return tasks, nil
 }
 
-func (t *todoEngineImpl) ListTask() ([]task.Task, error) {
+func (t *todoEngineImpl) ListTask() ([]*task.Task, error) {
 	return t.Storage, nil
 }
+
+// TODO:  Deleting todo list
