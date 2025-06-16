@@ -8,7 +8,7 @@ import (
 )
 
 type RenderingEngine interface {
-	Render()
+	Render() error
 	SetRenderObject(object menu.Menu)
 }
 
@@ -24,7 +24,7 @@ func (r *renderingEngineImpl) SetRenderObject(object menu.Menu) {
 	r.RenderObject = object
 }
 
-func (r *renderingEngineImpl) Render() {
+func (r *renderingEngineImpl) Render() error {
 	cursorIndex := r.RenderObject.GetCursorIndex()
 	fmt.Print("\033[H\033[2J")
 	for i, opt := range r.RenderObject.GetOptions() {
@@ -45,5 +45,12 @@ func (r *renderingEngineImpl) Render() {
 		}
 	}
 	r.RenderObject.SetCursorIndex(cursorIndex % len(r.RenderObject.GetOptions()))
+	if char == 'i' {
+		err := r.RenderObject.Callback(cursorIndex)
+		if err != nil {
+			return err
+		}
+	}
 
+	return nil
 }

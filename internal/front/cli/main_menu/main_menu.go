@@ -4,8 +4,8 @@ import (
 	"fmt"
 
 	"github.com/Lunarisnia/todo-llm/internal/core"
+	"github.com/Lunarisnia/todo-llm/internal/front/cli/clistate"
 	"github.com/Lunarisnia/todo-llm/internal/front/cli/menu"
-	"github.com/Lunarisnia/todo-llm/internal/input"
 )
 
 type MainMenu struct {
@@ -49,34 +49,21 @@ func (m *MainMenu) GetOptions() []menu.Option {
 	return m.Options
 }
 
-// NEXT TODO: Rendering engine
-// TODO: Should make a rendering engine to handle all the rendering
-func (m *MainMenu) Render() {
-	fmt.Print("\033[H\033[2J")
-	for i, opt := range m.Options {
-		prefix := ""
-		if m.CursorIndex == i {
-			prefix = "*"
-		}
-		fmt.Println(prefix, opt.Title)
+func (m *MainMenu) Callback(index int) error {
+	err := m.Options[index].Action()
+	if err != nil {
+		return err
 	}
-	r, _ := input.ReadKeyboard("")
-	if r == 'j' {
-		m.CursorIndex++
-	}
-	if r == 'k' {
-		m.CursorIndex--
-		if m.CursorIndex < 0 {
-			m.CursorIndex = len(m.Options) - 1
-		}
-	}
-	m.CursorIndex = m.CursorIndex % len(m.Options)
+	return nil
 }
 
+// TODO: Modify cli state
 func (m *MainMenu) AddNewTask() error {
+	clistate.State = clistate.AddNew
 	return nil
 }
 
 func (m *MainMenu) ListAllTask() error {
+	fmt.Println("List all task")
 	return nil
 }

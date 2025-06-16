@@ -1,4 +1,4 @@
-package cli
+package clistate
 
 type ProgramState string
 
@@ -15,3 +15,5 @@ func (e ProgramState) Value() string {
 func (e ProgramState) Compare(state ProgramState) bool {
 	return e == state
 }
+
+var State ProgramState = MainMenu
