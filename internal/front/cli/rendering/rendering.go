@@ -2,6 +2,7 @@ package rendering
 
 import (
 	"fmt"
+	"strconv"
 
 	"github.com/Lunarisnia/todo-llm/internal/front/cli/menu"
 	"github.com/Lunarisnia/todo-llm/internal/input"
@@ -10,7 +11,10 @@ import (
 type RenderingEngine interface {
 	Render() error
 	SetRenderObject(object menu.Menu)
+	SetCursorMode(mode bool)
 }
+
+var CursorMode bool = true
 
 type renderingEngineImpl struct {
 	RenderObject menu.Menu
@@ -25,32 +29,34 @@ func (r *renderingEngineImpl) SetRenderObject(object menu.Menu) {
 }
 
 func (r *renderingEngineImpl) Render() error {
-	cursorIndex := r.RenderObject.GetCursorIndex()
 	fmt.Print("\033[H\033[2J")
 	for i, opt := range r.RenderObject.GetOptions() {
-		prefix := ""
-		if cursorIndex == i {
-			prefix = "*"
-		}
-		fmt.Println(prefix, opt.Title)
-	}
-	char, _ := input.ReadKeyboard("")
-	if char == 'j' {
-		cursorIndex++
-	}
-	if char == 'k' {
-		cursorIndex--
-		if cursorIndex < 0 {
-			cursorIndex = len(r.RenderObject.GetOptions()) - 1
+		if len(r.RenderObject.GetOptions()) == 1 {
+			fmt.Println(opt.Title)
+		} else {
+			fmt.Println(i+1, opt.Title)
 		}
 	}
-	r.RenderObject.SetCursorIndex(cursorIndex % len(r.RenderObject.GetOptions()))
-	if char == 'i' {
-		err := r.RenderObject.Callback(cursorIndex)
+	if len(r.RenderObject.GetOptions()) == 1 {
+		err := r.RenderObject.Callback(0)
+		if err != nil {
+			return err
+		}
+	} else {
+		choice := input.Read("Enter your choice:")
+		choiceIndex, err := strconv.Atoi(choice)
+		if err != nil {
+			return err
+		}
+
+		err = r.RenderObject.Callback(choiceIndex - 1)
 		if err != nil {
 			return err
 		}
 	}
-
 	return nil
+}
+
+func (r *renderingEngineImpl) SetCursorMode(mode bool) {
+	CursorMode = mode
 }
