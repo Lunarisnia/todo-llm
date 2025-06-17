@@ -1,8 +1,6 @@
 package mainmenu
 
 import (
-	"fmt"
-
 	"github.com/Lunarisnia/todo-llm/internal/core"
 	"github.com/Lunarisnia/todo-llm/internal/front/cli/clistate"
 	"github.com/Lunarisnia/todo-llm/internal/front/cli/menu"
@@ -22,11 +20,6 @@ func NewMainMenu(todoEngine core.TodoEngine) menu.Menu {
 	mainMenu.Options = append(mainMenu.Options, menu.NewOption(
 		"Add New Task",
 		mainMenu.AddNewTask,
-	))
-
-	mainMenu.Options = append(mainMenu.Options, menu.NewOption(
-		"List All Task",
-		mainMenu.ListAllTask,
 	))
 
 	mainMenu.Options = append(mainMenu.Options, menu.NewOption(
@@ -57,13 +50,12 @@ func (m *MainMenu) Callback(index int) error {
 	return nil
 }
 
-// TODO: Modify cli state
 func (m *MainMenu) AddNewTask() error {
 	clistate.State = clistate.AddNew
 	return nil
 }
 
 func (m *MainMenu) ListAllTask() error {
-	fmt.Println("List all task")
+	clistate.State = clistate.ListAll
 	return nil
 }

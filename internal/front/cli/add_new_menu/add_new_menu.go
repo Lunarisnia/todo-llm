@@ -47,7 +47,7 @@ func (a *AddNewMenu) Callback(index int) error {
 }
 
 func (a *AddNewMenu) AddNewTask() error {
-	userInput := input.Read("foobar")
+	userInput := input.Read("")
 	task, err := a.TodoEngine.CreateTask(userInput)
 	if err != nil {
 		return err
