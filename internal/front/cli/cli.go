@@ -48,3 +48,5 @@ func (c *cliImpl) Run() {
 		c.Renderer.Render()
 	}
 }
+
+// TODO: add database to store data
